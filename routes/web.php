@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PruebasController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +20,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+#Rutas de Controladores API
+
+//USUARIO
+Route::post('/api/register', [UserController::class, 'register'])->name('api_user_register');
+Route::post('/api/login', [UserController::class, 'login'])->name('api_user_login');
+
+
+
+/*#Rutas Test
+
+//Se inserta el controlador al que se llama la funcion y se coloca el nombre de la funcion
+Route::get('/test', [PruebasController::class, 'testOrm'])->name('test_orm'); #Prueba del orm y relaciones de models
+
+#Route::get('/user/test', [UserController::class, 'test'])->name('user_test');
+#Route::get('/category/test', [CategoryController::class, 'test'])->name('post_test');
+#Route::get('/post/test', [PostController::class, 'test'])->name('category_test');*/
