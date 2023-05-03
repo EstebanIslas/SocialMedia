@@ -37,7 +37,9 @@ class UserController extends Controller
             }else{
 
                 # Cifrado de password
-                $pwd = password_hash($params->password, PASSWORD_BCRYPT, ['cost' => 4]);
+                //password_hash($params->password, PASSWORD_BCRYPT, ['cost' => 4]);
+                
+                $pwd =  hash('sha256', $params->password);//Hacer que el cifrado siempre retorne el mismo valor
 
                 # Set de User
                 $user = new User();
@@ -71,8 +73,11 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $jwtAuth = new \JwtAuth();
-        echo $jwtAuth->signup();
 
-        return "Action to log in User";
+        $emai = 'esteban@gmail.com';
+        $password = 'esteban';
+        $pwd =  hash('sha256', $password);//Hacer que el cifrado siempre retorne el mismo valor
+
+        return response()->json($jwtAuth->signup($emai, $pwd, true));
     }
 }
