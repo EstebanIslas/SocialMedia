@@ -74,10 +74,36 @@ class UserController extends Controller
     {
         $jwtAuth = new \JwtAuth();
 
-        $emai = 'esteban@gmail.com';
-        $password = 'esteban';
-        $pwd =  hash('sha256', $password);//Hacer que el cifrado siempre retorne el mismo valor
+        #Recibir datos POST
+        $json = $request->input('json', null);
+        $params = json_decode($json);
+        $params_array = \GuzzleHttp\json_decode($json, true);
+        
+        #Validar Datos
+        $validate = \Validator::make($params_array, [
+            'email'     => 'required|email',
+            'password'  => 'required'
+        ]);# Verificar duplicidad de datos 'unique'
 
-        return response()->json($jwtAuth->signup($emai, $pwd, true));
+        if ($validate->fails()) {
+            $signup = array(
+                'status'    => 'error',
+                'code'      => 404,
+                'message'   => 'El usuario no se ha identificado correctamente',
+                'errors'    => $validate->errors()
+            );
+        }else{
+            #Cifrado de pwd
+            $pwd =  hash('sha256', $params->password);//Hacer que el cifrado siempre retorne el mismo valor
+
+            #Devolver token o datos
+            $signup = $jwtAuth->signup($params->email, $pwd);
+
+            if (!empty($params->gettoken)) {
+                $signup = $jwtAuth->signup($params->email, $pwd, true);
+            }
+        }
+
+        return response()->json($signup, 200);
     }
 }
