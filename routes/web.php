@@ -27,6 +27,7 @@ Route::get('/', function () {
 //USUARIO
 Route::post('/api/register', [UserController::class, 'register'])->name('api_user_register');
 Route::post('/api/login', [UserController::class, 'login'])->name('api_user_login');
+Route::post('/api/user/update', [UserController::class, 'update'])->name('api_user_update');
 
 
 
