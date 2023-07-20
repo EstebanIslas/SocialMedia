@@ -32,7 +32,7 @@ Route::put('/api/user/update', [UserController::class, 'update'])->name('api_use
 Route::post('/api/user/upload', [UserController::class, 'upload'])
                             ->name('api_user_upload')->middleware(ApiAuthMiddleware::class);
 
-
+Route::get('/api/user/avatar/{filename}', [UserController::class, 'getImage'])->name('api_user_getimage');                         
 
 /*#Rutas Test
 

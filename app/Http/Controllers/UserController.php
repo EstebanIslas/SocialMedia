@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -196,5 +197,26 @@ class UserController extends Controller
         }
 
         return response()->json($data, $data['code']);
+    }
+
+    public function getImage($filename)
+    {
+        $isset = \Storage::disk('users')->exists($filename);
+
+        if ($isset) {
+
+            $file = \Storage::disk('users')->get($filename);
+            return new Response($file, 200);
+
+        }else {
+            
+            $data = array(
+                'code'    => 404,
+                'status'  => 'error',
+                'message'   => 'La imagen no existe'
+            );
+            return response()->json($data, $data['code']);
+        }
+        
     }
 }
