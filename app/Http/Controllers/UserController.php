@@ -109,16 +109,57 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
+
+        #Comprobar si el usuario esta identificado
+
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
 
-        if ($checkToken) {
-            echo "<h3>Login correcto</h3>";
+        #Recibir datos Post
+
+        $json = $request->input('json', null);
+        $params_array = json_decode($json, true);
+
+        if ($checkToken && !empty($params_array)) {
+
+            #Obtener usuario identificado
+            $user = $jwtAuth->checkToken($token, true);
+
+            #Validar Datos
+            $validate = \Validator::make($params_array, [
+                'name'      => 'required|alpha',
+                'surname'   => 'required|alpha',
+                'email'     => 'required|email|unique:users'.$user->sub
+            ]);# Verificar duplicidad de datos
+
+            #Remover campos que no se van a actualizar
+            unset($params_array['id']);
+            unset($params_array['role']);
+            unset($params_array['password']);
+            unset($params_array['created_at']);
+            unset($params_array['remember_token']);
+
+            #Actualizar en la Bd
+            $user_update = User::where('id', $user->sub)->update($params_array);
+
+            #Retornar resultado
+            $data = array(
+                'code'     => 200,
+                'status'   => 'success',
+                'message'  => 'El usuario se ha actualizado exitosamente',
+                'user'     => $user,
+                'changes' => $params_array
+            );
+
         }else{
-            echo "<h3>Login incorrecto</h3>";
+            $data = array(
+                'code'     => 400,
+                'status'   => 'error',
+                'message'  => 'El usuario no esta identificado'
+            );
         }
 
-        die();
+        return response()->json($data, $data['code']);
     }
 }
