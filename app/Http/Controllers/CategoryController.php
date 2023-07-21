@@ -126,4 +126,32 @@ class CategoryController extends Controller
         return response()->json($data, $data['code']);
         
     }
+
+    public function destroy($id)
+    {
+        #Obtener datos por post
+        $category = Category::find($id);
+
+        #Comprobar que existan los datos
+        if (!empty($category)) {
+            
+            #Eliminar registro
+            $category->delete();
+
+            $data = [
+                'code'      => 200,
+                'status'    => 'success',
+                'message'   => $category
+            ];
+        } else {
+            $data = [
+                'code'      => 200,
+                'status'    => 'success',
+                'message'   => 'Error al eliminar categoria, relacion o no existe'
+            ];
+        }
+        
+        #Retornar el resultado
+        return response()->json($data, $data['code']);
+    }
 }
