@@ -38,6 +38,8 @@ Route::get('/api/user/detail/{id}', [UserController::class, 'detail'])->name('ap
 //CATEGORIAS
 Route::resource('/api/category', CategoryController::class);#Rutas resource
 
+//POSTS
+Route::resource('/api/post', PostController::class);#Rutas resource
 
 /*#Rutas Test
 
