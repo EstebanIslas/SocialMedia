@@ -35,6 +35,10 @@ Route::post('/api/user/upload', [UserController::class, 'upload'])
 Route::get('/api/user/avatar/{filename}', [UserController::class, 'getImage'])->name('api_user_getimage');
 Route::get('/api/user/detail/{id}', [UserController::class, 'detail'])->name('api_user_detail');                  
 
+//CATEGORIAS
+Route::resource('/api/category', CategoryController::class);#Rutas resource
+
+
 /*#Rutas Test
 
 //Se inserta el controlador al que se llama la funcion y se coloca el nombre de la funcion
