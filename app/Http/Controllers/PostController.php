@@ -11,7 +11,14 @@ class PostController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('api.auth', ['except' => ['index', 'show', 'getImage']]);
+        $this->middleware('api.auth', ['except' => [
+            'index', 
+            'show', 
+            'getImage',
+            'getPostsByCategory',
+            'getPostsByUser'
+            ]
+        ]);
     }
 
     #OBTENER USUARIO IDENTIFICADO CON TOKEN
@@ -238,5 +245,28 @@ class PostController extends Controller
         
         return response()->json($data, $data['code']);
 
+    }
+
+    public function getPostsByCategory($id){
+
+        $posts = Post::where('category_id', $id)->get();
+
+        if (is_object($posts)) {
+            $data = $this->getData($posts, '200');
+        }else{
+            $data = $this->getData('Error Los posts no existen', '400');
+        }
+        return response()->json($data, $data['code']);
+    }
+
+    public function getPostsByUser($id){
+        $posts = Post::where('user_id', $id)->get();
+
+        if (is_object($posts)) {
+            $data = $this->getData($posts, '200');
+        }else{
+            $data = $this->getData('Error Los posts no existen', '400');
+        }
+        return response()->json($data, $data['code']);
     }
 }

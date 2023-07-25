@@ -43,6 +43,8 @@ Route::resource('/api/post', PostController::class);#Rutas resource
 
 Route::post('/api/post/upload', [PostController::class, 'upload'])->name('api_post_upload');//Subir imagenes en post_table
 Route::get('/api/post/image/{filename}', [PostController::class, 'getImage'])->name('api_post_getimage');
+Route::get('/api/post/category/{id}', [PostController::class, 'getPostsByCategory'])->name('api_post_getpostbycat');
+Route::get('/api/post/user/{id}', [PostController::class, 'getPostsByUser'])->name('api_post_getpostbyuser');
 
 /*#Rutas Test
 
