@@ -23,23 +23,33 @@ class PostController extends Controller
 
         return $user;
     }
+
+    private function getData($fill, $status){
+
+        if ($status == '200') {
+            $data = array(
+                'code'       => 200,
+                'status'     => 'success',
+                'posts' => $fill
+            );
+        }else {
+            $data = array(
+                'code'       => 404,
+                'status'     => 'error',
+                'message'    => $fill
+            );
+        }
+        return $data;
+    }
     
     public function index()
     {
         $post = Post::all()->load('category');
         
         if (is_object($post)) {
-            $data = array(
-                'code'       => 200,
-                'status'     => 'success',
-                'posts' => $post
-            );
+            $data = $this->getData($post, '200');
         }else{
-            $data = array(
-                'code'       => 404,
-                'status'     => 'error',
-                'message'    => 'Los posts no existen'
-            );
+            $data = $this->getData('Error al consultar los post', '404');
         }
 
         return response()->json($data, $data['code']);
@@ -49,17 +59,9 @@ class PostController extends Controller
         $post = Post::find($id)->load('category');
 
         if (is_object($post)) {
-            $data = array(
-                'code'       => 200,
-                'status'     => 'success',
-                'posts' => $post
-            );
+            $data = $this->getData($post, '200');
         }else{
-            $data = array(
-                'code'       => 404,
-                'status'     => 'error',
-                'message'    => 'El posts no existe'
-            );
+            $data = $this->getData('Error al consultar los post', '404');
         }
 
         return response()->json($data, $data['code']);
@@ -87,11 +89,7 @@ class PostController extends Controller
             ]);
 
             if ($validate->fails()) {
-                $data = [
-                    'code'      => 400,
-                    'status'    => 'error',
-                    'message'   => 'Error al guardar post, faltan datos'
-                ];
+                $data = $this->getData('Error al guardar post, faltan datos', '404');
             } else {
                 #Guardar datos en Bd
                 $post = new Post();
@@ -103,19 +101,11 @@ class PostController extends Controller
 
                 $post->save();
 
-                $data = array(
-                    'code'       => 200,
-                    'status'     => 'success',
-                    'posts'      => $post
-                );
+                $data = $this->getData($post, '200');
             }
                 
         } else {
-            $data = [
-                'code'      => 400,
-                'status'    => 'error',
-                'message'   => 'Error al guardar post, faltan datos'
-            ];
+            $data = $this->getData('Error al guardar post, los campos estan vacios', '404');
         }
         
         #Retornar Resultado
@@ -138,11 +128,7 @@ class PostController extends Controller
             ]);
 
             if ($validate->fails()) {
-                $data = [
-                    'code'       => 404,
-                    'status'     => 'error',
-                    'message'    => 'El post no se actualizó faltan datos'
-                ];
+                $data = $this->getData('Error al guardar post, faltan datos', '404');
             } else {
                 
                 #Omitir campos para no actualizar
@@ -162,20 +148,12 @@ class PostController extends Controller
                     #actualizar datos en la Bd
                     $post->update($params_array);
 
-                    $data = array(
-                        'code'      => 200,
-                        'status'    => 'success',
-                        'post'   => $post,
-                        'changes'   => $params_array
-                    );
+                    $data = $this->getData($post, '200');
                 
                 }else{
 
-                    $data = [
-                        'code'      => 400,
-                        'status'    => 'error',
-                        'message'   => 'Error al actualizar, el usuario no es propietario del post'
-                    ];
+                    $data = $this->getData('Error al actualizar, el usuario no es propietario del post', '404');
+
                 }
                 
                 /*#actualizar datos en la Bd
@@ -189,11 +167,7 @@ class PostController extends Controller
             }
             
         } else {
-            $data = [
-                'code'      => 400,
-                'status'    => 'error',
-                'message'   => 'Error al actualizar post'
-            ];
+            $data = $this->getData('Error al guardar post, los campos estan vacios', '404');
         }
         
         #Retornar Resultado
@@ -213,17 +187,9 @@ class PostController extends Controller
             #Eliminar registro
             $post->delete();
 
-            $data = [
-                'code'      => 200,
-                'status'    => 'success',
-                'message'   => $post
-            ];
+            $data = $this->getData($post, '200');
         }else {
-            $data = [
-                'code'      => 400,
-                'status'    => 'error',
-                'message'   => 'Error al eliminar post, no existe el valor'
-            ];
+            $data = $this->getData('Error al eliminar post', '404');
         }
         #Retornar resultado
         return response()->json($data, $data['code']);
