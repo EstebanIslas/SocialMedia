@@ -14,6 +14,16 @@ class PostController extends Controller
         $this->middleware('api.auth', ['except' => ['index', 'show']]);
     }
 
+    #OBTENER USUARIO IDENTIFICADO CON TOKEN
+    private function getIdentity($request){
+
+        $jwtAuth = new JwtAuth();
+        $token = $request->header('Authorization', null);
+        $user = $jwtAuth->checkToken($token, true);
+
+        return $user;
+    }
+    
     public function index()
     {
         $post = Post::all()->load('category');
@@ -66,9 +76,7 @@ class PostController extends Controller
         if (!empty($params_array)) {
             
             #Obtener usuario identificado por token
-            $jwtAuth = new JwtAuth();
-            $token = $request->header('Authorization', null);
-            $user = $jwtAuth->checkToken($token, true);
+            $user = $this->getIdentity($request);
 
             #Validar datos
             $validate = \Validator::make($params_array, [
@@ -142,15 +150,42 @@ class PostController extends Controller
                 unset($params_array['user_id']);
                 unset($params_array['created_at']);
                 unset($params_array['user']);
+
+                #Obtener usuario identificado por token
+                $user = $this->getIdentity($request);
         
-                #actualizar datos en la Bd
-                $post = Post::where('id', $id)->update($params_array);
-        
-                $data = [
-                    'code'      => 200,
-                    'status'    => 'success',
-                    'message'   => $params_array
+                #Obtener post que pertenezca al user logueado
+                $post = Post::where('id', $id)->where('user_id', $user->sub)->first();
+
+                if (!empty($post) && is_object($post)) {
+                  
+                    #actualizar datos en la Bd
+                    $post->update($params_array);
+
+                    $data = array(
+                        'code'      => 200,
+                        'status'    => 'success',
+                        'post'   => $post,
+                        'changes'   => $params_array
+                    );
+                
+                }else{
+
+                    $data = [
+                        'code'      => 400,
+                        'status'    => 'error',
+                        'message'   => 'Error al actualizar, el usuario no es propietario del post'
+                    ];
+                }
+                
+                /*#actualizar datos en la Bd
+                $where = [
+                    'id' => $id,
+                    'user_id' =>$user->sub
                 ];
+
+                $post = Post::updateOrCreate($where, $params_array);*/
+        
             }
             
         } else {
@@ -166,9 +201,12 @@ class PostController extends Controller
     }
 
     public function destroy($id, Request $request){
+
+        #Obtener user logueado
+        $user = $this->getIdentity($request);
         
         #Obtener datos por post
-        $post = Post::find($id);
+        $post = Post::where('id', $id)->where('user_id', $user->sub)->first();
 
         #Comprobar si existe
         if(!empty($post)){
