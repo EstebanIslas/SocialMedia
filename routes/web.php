@@ -41,6 +41,8 @@ Route::resource('/api/category', CategoryController::class);#Rutas resource
 //POSTS
 Route::resource('/api/post', PostController::class);#Rutas resource
 
+Route::post('/api/post/upload', [PostController::class, 'upload']);//Subir imagenes en post_table
+
 /*#Rutas Test
 
 //Se inserta el controlador al que se llama la funcion y se coloca el nombre de la funcion

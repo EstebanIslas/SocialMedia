@@ -194,4 +194,29 @@ class PostController extends Controller
         #Retornar resultado
         return response()->json($data, $data['code']);
     }
+
+    #Subir imagenes
+    public function upload(Request $request){
+        #Obtener imagen de la peticion
+        $image = $request->file('file0');
+
+        #Validar la imagen
+        $validate = \Validator::make($request->all(), [
+            'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
+        ]);
+
+        #Guardar imagen en disco images
+        if (!$image || $validate->fails()) {
+            $data = $this->getData('Error al subir imagen', '400');
+        }else{
+            $image_name = time().$image->getClientOriginalName();
+
+            \Storage::disk('images')->put($image_name, \File::get($image));
+
+            $data = $this->getData($image_name, '200');
+        }
+
+        #Retornar resultado
+        return response()->json($data, $data['code']);
+    }
 }
